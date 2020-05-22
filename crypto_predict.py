@@ -4,12 +4,27 @@ from sklearn import preprocessing
 from collections import deque
 import random
 import numpy as np
+import time
+import tensorflow as tf 
+from tensorflow.keras.models import Sequential 
+from tensorflow.keras.layers import Activation, Dense, Dropout, LSTM, BatchNormalization, LeakyReLU 
+from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint 
 
+'''
+Variables:
+How many batches? Try smaller batches if you're getting an OOM error.
+OOM = Out of Memory.
+SEQ_LEN = how long of a preceeding sequence to collect for RNN.
+Sequence Length is 60 mins long. 
+EPOCHS = how many passes through our data.
+'''
 SEQ_LEN = 60
-# sequence is 60 mins long
 FUTURE_PERIOD_PREDICT = 3
 # 1 period = 1 minute, eg 3 periods = 3 mins
 RATIO_TO_PREDICT = 'LTC-USD'
+EPOCHS = 10
+BATCH_SIZE = 64 
+NAME = f'{SEQ_LEN}-SEQ-{FUTURE_PERIOD_PREDICT}-PRED-{int(time.time())}'
 
 '''
 Establishing a realtionship with the classify function. 
@@ -101,7 +116,7 @@ names = ['time', 'low', 'high', 'open', 'close', 'volume']
 ratios = ['BTC-USD', 'LTC-USD', 'ETH-USD', 'BCH-USD']
 
 '''
-Makes new dataframe that incorporates all crypto currencies
+Make new dataframe that incorporates all crypto currencies
 '''
 for ratio in ratios:
     dataset = f'crypto_data/{ratio}.csv'
@@ -133,8 +148,78 @@ train_x, train_y, = preprocess_df(main_df)
 val_x, val_y = preprocess_df(val_main_df)
 
 '''
-Print out some stats
+Verify data split
 '''
 print(f'train data: {len(train_x)}, val: {len(val_x)}')
-print(f'Dont buys: {train_y.count(0)}, buys: {val_y.count(1)}')
+print(f'Dont buys: {train_y.count(0)}, buys: {train_y.count(1)}')
 print(f'VALIDATION Dont buys: {val_y.count(0)}, buys: {val_y.count(1)}')
+
+'''
+RNN Architecture
+''' 
+model = Sequential(name='Crypto_Model')
+
+model.add(Dense(128, input_shape=(train_x.shape[1:]), activation='relu'))
+
+model.add(Dense(128, activation='relu'))
+model.add(LeakyReLU(alpha=0.05))
+model.add(Dense(128, activation='relu'))
+
+model.add(Dense(128, activation='softmax'))
+'''
+
+model.add(Dropout(0.2))
+model.add(BatchNormalization())
+
+model.add(LSTM(128, return_sequences=True))
+model.add(Dropout(0.1))
+model.add(BatchNormalization())
+
+model.add(LSTM(128))
+model.add(Dropout(0.2))
+model.add(BatchNormalization())
+
+model.add(Dense(32, activation="relu"))
+model.add(Droupout(0.2))
+
+model.add(Dense(2, activation="softmax"))
+'''
+opt = tf.keras.optimizers.Adam(lr=0.001, decay=1e-6)
+
+'''
+Compile Model
+'''
+model.compile(loss='binary_crossentropy', 
+              optimizer=opt,
+              metrics=['acc', 'binary_crossentropy', 'cosine_proximity'])
+
+tensorboard = TensorBoard(log_dir='logs/{}'.format(NAME))
+
+'''
+Unique file name that will include the epoch and
+the validation accuracy for that epoch.
+Checkpoint only saves the best ones.
+'''
+filepath = 'RNN_Final-{epoch:02d}-{val_acc:.3f}'
+checkpoint = ModelCheckpoint('models/{}.model'.format(filepath, 
+                                                      monitor='val_acc', 
+                                                      verbose=1, 
+                                                      save_best_only=True, 
+                                                      mode='max'))
+
+'''
+Train the model
+'''
+train_x = np.asarray(train_x)
+train_y = np.asarray(train_y)
+val_x = np.asarray(val_x)
+val_y = np.asarray(val_y)
+
+history = model.fit(train_x, train_y,
+                    batch_size=BATCH_SIZE,
+                    epochs=EPOCHS,
+                    validation_data=(val_x, val_y),
+                    callbacks=[tensorboard, checkpoint])
+
+print(train_x.shape)
+print(train_y.shape)
