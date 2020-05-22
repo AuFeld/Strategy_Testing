@@ -14,3 +14,10 @@
 5. Data Visualization with Results
 
 6. Deployment Strategy
+
+# Tech Stack
+- Tensorflow
+- Sklearn
+- Pandas
+- Numpy
+- Matplotlib
