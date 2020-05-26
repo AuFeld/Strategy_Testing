@@ -4,3 +4,5 @@ sklearn
 tensorflow
 keras
 matplotlib
+beautifulsoup
+yfinance
