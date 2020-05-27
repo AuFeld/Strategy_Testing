@@ -16,10 +16,11 @@
 ### 4. Model Analysis
 - [X] Optimize neural network model with hyperparameter tuning
 - [ ] Track model accuracy with sentiment analysis
+- [ ] Deploy Tensorboard
 
 ### 5. Data Visualization with Results
 - [X] Graph Neural Network Results
-- [ ] Graph Sentiment Analysis Results
+- [ ] Graph Sentiment Analysis Results 
 
 ### 6. Deployment Strategy
 - [ ] Deploy Interactive Model via Flask or FastAPI
