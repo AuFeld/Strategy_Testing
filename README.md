@@ -2,7 +2,7 @@
 
 ### 1. Hypothesis Objectives
 - [X] Train a model with a neural network to predict future index returns 
-- [X] Outperform baseline of 51%
+- [X] Outperform baseline
 - [ ] Improve neural network with sentiment analysis and record results
 
 ### 2. Data Acquisition
@@ -16,7 +16,6 @@
 ### 4. Model Analysis
 - [X] Optimize neural network model with hyperparameter tuning
 - [ ] Track model accuracy with sentiment analysis
-- [ ] Deploy Tensorboard
 
 ### 5. Data Visualization with Results
 - [X] Graph Neural Network Results
