@@ -1,4 +1,4 @@
-# NN_Predicting
+# Strategy Testing
 
 ### 1. Hypothesis Objectives
 - [X] Train a model with a neural network to predict future index returns 
